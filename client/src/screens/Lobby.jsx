@@ -5,6 +5,7 @@ import { useSocket } from "../context/SocketProvider";
 const LobbyScreen = () => {
 	const [email, setEmail] = useState("");
 	const [room, setRoom] = useState("");
+	const [loading, setLoading] = useState(false);
 
 	const socket = useSocket();
 	const navigate = useNavigate();
@@ -12,6 +13,7 @@ const LobbyScreen = () => {
 	const handleSubmitForm = useCallback(
 		(e) => {
 			e.preventDefault();
+			setLoading(true);
 			socket.emit("room:join", { email, room });
 		},
 		[email, room, socket]
@@ -19,7 +21,8 @@ const LobbyScreen = () => {
 
 	const handleJoinRoom = useCallback(
 		(data) => {
-			const { email, room } = data;
+			const { room } = data;
+			setLoading(false);
 			navigate(`/room/${room}`);
 		},
 		[navigate]
@@ -81,9 +84,19 @@ const LobbyScreen = () => {
 
 				<button
 					type='submit'
-					className='w-full bg-blue-600 hover:bg-blue-500 text-white font-semibold py-2 rounded-lg transition duration-200'
+					disabled={loading}
+					className={`w-full ${
+						loading ? "bg-gray-600" : "bg-blue-600 hover:bg-blue-500"
+					} text-white font-semibold py-2 rounded-lg transition duration-200 flex items-center justify-center`}
 				>
-					Join
+					{loading ? (
+						<svg
+							className='animate-spin h-5 w-5 mr-3 border-t-2 border-white rounded-full'
+							viewBox='0 0 24 24'
+						></svg>
+					) : (
+						"Join"
+					)}
 				</button>
 			</form>
 		</div>
